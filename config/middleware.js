@@ -35,7 +35,7 @@ function authenticate(req, res, next) {
       
       if (err) {
         // token verification failed
-        res.status(401).json({ message: 'invalid token'});
+        res.status(401).json({ message: 'cannot retrieve information'});
       } else {
         // token is valid
         req.decodedToken = decodedToken; // sub-agent middleware of route handler have access to this

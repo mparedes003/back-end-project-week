@@ -9,7 +9,7 @@ const db = knex(knexConfig.development);
 
 const router = express.Router();
 
-const { authenticte, generateToken } = require('./middleware.js');
+const { authenticate, generateToken } = require('./middleware.js');
 
 // ROUTES/ENDPOINTS
 
@@ -35,8 +35,28 @@ router.post('/register', (req, res) => {
     });
 });
 
+// Add POST ROUTE HANDLER so user must have valid login to access all of the notes
+router.post('/login', (req, res) => {
+  const creds = req.body;
+
+  db('users')
+    .where({ usersEmail: creds.usersEmail })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(creds.password, user.password)) {
+        const token = generateToken(user); 
+        res.status(200).json({ welcome: user.usersEmail, token });
+      } else {
+        res.status(401).json({ message: 'login information not found' });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ err });
+    });
+});
+
 // Add GET ROUTE HANDLER to get the list of notes
-router.get('/', (req, res) => {
+router.get('/', authenticate, (req, res) => {
   db('notes')
     .then(notes => {
       res.status(200).json(notes);
