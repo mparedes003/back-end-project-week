@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 
 const knex = require('knex');
 
@@ -8,9 +9,31 @@ const db = knex(knexConfig.development);
 
 const router = express.Router();
 
+const { authenticte, generateToken } = require('./middleware.js');
+
 // ROUTES/ENDPOINTS
 
 // =================NOTES ENDPOINTS===================
+
+// Add POST Rout Handler to Resgister/Create a user
+router.post('/register', (req, res) => {
+  const credentials = req.body;
+
+  const hash = bcrypt.hashSync(credentials.password, 15);
+  credentials.password = hash;
+
+  db('users')
+    .insert(credentials)
+    .then(ids => {
+      const id = ids[0];
+      // query the database to get the user
+      const token = generateToken({ username: credentials.username });
+      res.status(201).json({ newUserId: id, token });
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+});
 
 // Add GET ROUTE HANDLER to get the list of notes
 router.get('/', (req, res) => {
