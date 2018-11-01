@@ -9,7 +9,7 @@ const db = knex(knexConfig.development);
 const router = express.Router();
 
 // ROUTES/ENDPOINTS
-
+const port = 9900;
 // Add home endpoint
 router.get('/', (req, res) => {
   res.send(`Api running on port: ${port}`);
