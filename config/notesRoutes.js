@@ -3,9 +3,10 @@ const express = require('express');
 
 const knex = require('knex');
 
-const knexConfig = require('../knexfile.js');
+const dbEngine = process.env.DB || 'development';
+const knexConfig = require('../knexfile.js')[dbEngine];
 
-const db = knex(knexConfig.development);
+const db = knex(knexConfig);
 
 const router = express.Router();
 
