@@ -1,10 +1,10 @@
-require('dotenv').config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 
-const knex = require('knex');
+const knex = require("knex");
 
-const dbEngine = process.env.DB || 'development';
-const knexConfig = require('../knexfile.js')[dbEngine];
+const dbEngine = process.env.DB || "development";
+const knexConfig = require("../knexfile.js")[dbEngine];
 
 const db = knex(knexConfig.development);
 
@@ -13,15 +13,15 @@ const router = express.Router();
 // ROUTES/ENDPOINTS
 const port = process.env.PORT || 9900;
 // Add home endpoint
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
   res.send(`Api running on port: ${port}`);
 });
 
 // =================NOTES ENDPOINTS===================
 
 // Add GET ROUTE HANDLER to get the list of notes
-router.get('/notes', (req, res) => {
-  db('notes')
+router.get("/notes", (req, res) => {
+  db("notes")
     .then(notes => {
       res.status(200).json(notes);
     })
@@ -29,18 +29,22 @@ router.get('/notes', (req, res) => {
 });
 
 // Add GET ROUTE HANDLER to get a note by id
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const note = await db('notes')
+    const note = await db("notes")
       .where({ id })
       .first();
 
     if (note) {
       res.status(200).json(note);
     } else {
-      res.status(404).send({ error: "Note id does not exist. Please provide a valid note id." });
+      res
+        .status(404)
+        .send({
+          error: "Note id does not exist. Please provide a valid note id."
+        });
     }
   } catch (error) {
     res.status(500).json(error);
@@ -48,14 +52,18 @@ router.get('/:id', async (req, res) => {
 });
 
 // Add POST ROUTE HANDLER to create a note
-router.post('/notes', (req, res) => {
-  if (!req.body.title || !req.body.textBody){
-    return res.status(400).send({ error: "Please provide a valid title and text body for this note." });
+router.post("/notes", (req, res) => {
+  if (!req.body.title || !req.body.textBody) {
+    return res
+      .status(400)
+      .send({
+        error: "Please provide a valid title and text body for this note."
+      });
   }
   const note = req.body;
 
   db.insert(note)
-    .into('notes')
+    .into("notes")
     .then(ids => {
       res.status(201).json(ids[0]);
     })
@@ -65,39 +73,40 @@ router.post('/notes', (req, res) => {
 });
 
 //Add DELETE ROUTE HANDLER to delete a note
-router.delete('/notes/:id', async (req, res) => {
+router.delete("/notes/:id", async (req, res) => {
   const { id } = req.params;
 
-  db('notes')
-    .where ({ id })
+  db("notes")
+    .where({ id })
     .del()
     .then(count => {
       if (!count || count < 1) {
-        res.status(404).json({ message: 'No records found to delete.'});
+        res.status(404).json({ message: "No records found to delete." });
       } else {
         res.status(200).json(count);
       }
     })
     .catch(err => res.status(500).json(err));
-  });
+});
 
-  //Add PUT ROUTE HANDLER to update a note
-router.put('/notes/:id', async (req, res) => {
+//Add PUT ROUTE HANDLER to update a note
+router.put("/notes/:id", async (req, res) => {
   const { id } = req.params;
   const changes = req.body;
 
-  db('notes')
-    .where ({ id })
+  db("notes")
+    .where({ id })
     .update(changes)
     .then(count => {
       if (!count || count < 1) {
-        res.status(404).json({ message: "No records found to update."});
+        res.status(404).json({ message: "No records found to update." });
       } else {
         res.status(200).json(count);
       }
     })
     .catch(err => res.status(500).json(err));
-  });
+});
 
 module.exports = router;
-module.exports = require('knex')(knexConfig);
+// module.exports = require('knex')(knexConfig);
+module.exports = knex(knexConfig);
