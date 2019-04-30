@@ -1,10 +1,10 @@
-require("dotenv").config();
+// require("dotenv").config();
 const express = require("express");
 
-const knex = require("knex");
+// const knex = require("knex");
 
-const dbEngine = process.env.DB || "development";
-const knexConfig = require("../knexfile.js")[dbEngine];
+// const dbEngine = process.env.DB || "development";
+// const knexConfig = require("../knexfile.js")[dbEngine];
 
 const db = knex(knexConfig.development);
 
@@ -40,11 +40,9 @@ router.get("/:id", async (req, res) => {
     if (note) {
       res.status(200).json(note);
     } else {
-      res
-        .status(404)
-        .send({
-          error: "Note id does not exist. Please provide a valid note id."
-        });
+      res.status(404).send({
+        error: "Note id does not exist. Please provide a valid note id."
+      });
     }
   } catch (error) {
     res.status(500).json(error);
@@ -54,11 +52,9 @@ router.get("/:id", async (req, res) => {
 // Add POST ROUTE HANDLER to create a note
 router.post("/notes", (req, res) => {
   if (!req.body.title || !req.body.textBody) {
-    return res
-      .status(400)
-      .send({
-        error: "Please provide a valid title and text body for this note."
-      });
+    return res.status(400).send({
+      error: "Please provide a valid title and text body for this note."
+    });
   }
   const note = req.body;
 
@@ -109,4 +105,4 @@ router.put("/notes/:id", async (req, res) => {
 
 module.exports = router;
 // module.exports = require('knex')(knexConfig);
-module.exports = knex(knexConfig);
+// module.exports = knex(knexConfig);
