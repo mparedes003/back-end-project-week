@@ -6,7 +6,9 @@ const express = require("express");
 // const dbEngine = process.env.DB || "development";
 // const knexConfig = require("../knexfile.js")[dbEngine];
 
-const db = knex(knexConfig.development);
+// const db = knex(knexConfig.development);
+
+const db = require("../data/dbconfig");
 
 const router = express.Router();
 
